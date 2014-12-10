@@ -42,6 +42,7 @@ deNormalize = function(df, overall, cols, rows){
 }
 
 train = function(df){
+  #   SVDmiss(df, niter = 25)$svd
   svd(df)
 }
 
