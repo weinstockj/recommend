@@ -1,16 +1,24 @@
 library('deepnet')
 source("svd_utils.R")
-df = read.csv('u_clean_normalized.data')
-df = df[, -1]
-USER_ID = df[, 1]
 
-mod = rbm.train(as.matrix(df[, 2:ncol(df)]), hidden = 50, numepochs = 10)
+DATA_DIR = "~/2nd semester 2014/machine learning/project/implementation/data/ml-100k/ml-100k/"
+FILE_NAME = "u.data"
+# FILE_NAME = "u1.base"
+FULL_PATH = paste0(DATA_DIR, FILE_NAME)
+moviesMelt = cleanData(FULL_PATH)
+USER_ID = moviesMelt[[1]]
+moviesMelt = moviesMelt[[2]]
+moviesMeltNorm = preProcess(moviesMelt)
+OVERALL_MEAN = moviesMeltNorm[[2]]
+COL_MEANS = moviesMeltNorm[[3]]
+ROW_MEANS = moviesMeltNorm[[4]]
+moviesMeltNorm = moviesMeltNorm[[1]]
+moviesMeltNorm = impute(moviesMeltNorm)
+mod = rbm.train(moviesMeltNorm, hidden = 50, numepochs = 10)
 
-h = rbm.up(mod, as.matrix(df[, 2:ncol(df)]))
-v = rbm.down(mod, h)
+h = rbm.up(mod, moviesMeltNorm)
+pred = rbm.down(mod, h)
+pred = preProcess(as.data.frame(pred), F)
+pred = deNormalize(pred, OVERALL_MEAN, COL_MEANS, ROW_MEANS)
 
-pred = cbind(USER_ID, v)
-
-pred = preProcess(as.data.frame(pred))
-
-r = evaluate(df, pred)
+r = evaluate(moviesMelt, pred)
