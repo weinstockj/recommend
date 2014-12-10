@@ -42,7 +42,7 @@ deNormalize = function(df, overall, cols, rows){
 }
 
 train = function(df){
-  SVDmiss(df, niter = 25)$svd
+  svd(df)
 }
 
 predict = function(newdata, model, number = ceiling(nrow(newdata)/ 400)){
